@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 - V13.7 (Music Player Fixed)</title>
+    <title>Gen 1 - V13.8 (Auto Music Title)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1716,6 +1716,14 @@
 
                 this.ai.renderGrid(); this.ai.loadSavedEvents(); this.ai.initTimeSelects();
                 this.goals.init(); this.stats.init(); this.settings.load(); this.settings.renderGallery();
+
+                // Force Reset Model to Stable Version
+                let savedModel = localStorage.getItem('g1-ai-model');
+                if (savedModel === 'gemini-2.0-flash-exp' || !savedModel) {
+                    savedModel = 'gemini-1.5-flash';
+                    localStorage.setItem('g1-ai-model', savedModel);
+                }
+                // document.getElementById('model-input').value = savedModel; // Removed model input to simplify
             },
 
             nav(id) {
@@ -1781,7 +1789,7 @@
             stats: { data: { pomos: 0, focusMinutes: 0, daily: [0, 0, 0, 0, 0, 0, 0] }, chart: null, init() { const s = localStorage.getItem('g1-stats'); if (s) this.data = JSON.parse(s); this.render(); }, logPomo(m) { this.data.pomos++; this.data.focusMinutes += m; const d = new Date().getDay(); const i = d === 0 ? 6 : d - 1; this.data.daily[i] += m; this.save(); this.render(); }, save() { localStorage.setItem('g1-stats', JSON.stringify(this.data)) }, render() { document.getElementById('total-focus-time').innerText = `${Math.floor(this.data.focusMinutes / 60)}h ${this.data.focusMinutes % 60}m`; if (this.chart) this.chart.destroy(); const ctx = document.getElementById('stats-chart').getContext('2d'); this.chart = new Chart(ctx, { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Mins', data: this.data.daily, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false } }); } },
             reminder: { timer: null, start(m) { clearTimeout(this.timer); this.timer = setTimeout(() => { document.getElementById('break-overlay').classList.add('active'); document.getElementById('audio-break').play(); }, m * 60 * 1000); }, close() { document.getElementById('break-overlay').classList.remove('active'); document.getElementById('audio-break').pause(); } },
 
-            // --- MUSIC PLAYER FIXED (TIMELINE & ADD SONG) ---
+            // --- MUSIC PLAYER FIXED (TIMELINE & AUTO TITLE) ---
             music: {
                 player: null, isPlaying: false, currentIndex: 0, progressTimer: null,
                 playlist: JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }],
@@ -1823,16 +1831,24 @@
                 loadTrack(i, auto = true) { this.currentIndex = i; const t = this.playlist[i]; document.getElementById('track-title').innerText = t.title; document.getElementById('current-art').innerHTML = `<img src="https://img.youtube.com/vi/${t.id}/0.jpg">`; this.renderList(); if (this.player && this.player.loadVideoById) { if (auto) this.player.loadVideoById(t.id); else this.player.cueVideoById(t.id); } },
                 updateBtn() { document.getElementById('play-btn').innerHTML = this.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; },
 
-                addFromInput() {
+                async addFromInput() {
                     const url = document.getElementById('yt-url-input').value;
                     const v = url.match(/[?&]v=([^&]+)/);
                     if (v) {
-                        const name = prompt("Nhập tên bài hát:", "New Song");
-                        this.playlist.push({ title: name || "New Song", id: v[1] });
+                        let title = "New Song";
+                        try {
+                            const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${v[1]}`);
+                            const data = await res.json();
+                            title = data.title || "New Song";
+                        } catch (e) {
+                            console.error("Auto-title failed", e);
+                        }
+
+                        this.playlist.push({ title: title, id: v[1] });
                         localStorage.setItem('yt_playlist', JSON.stringify(this.playlist));
                         this.renderList();
                         document.getElementById('yt-url-input').value = '';
-                        app.toast("Song Added!");
+                        app.toast(`Added: ${title}`);
                     } else {
                         app.toast("Invalid URL");
                     }
@@ -1846,7 +1862,7 @@
             },
             deep: { timer: null, sec: 0, start() { app.nav('deep-view'); document.documentElement.requestFullscreen().catch(() => { }); this.timer = setInterval(() => { this.sec++; document.getElementById('deep-display').innerText = new Date(this.sec * 1000).toISOString().substr(11, 8) }, 1000); app.reminder.start(60); }, stop() { clearInterval(this.timer); document.exitFullscreen().catch(() => { }); app.nav('home-view'); app.reminder.close(); app.stats.logPomo(Math.floor(this.sec / 60)); } },
             pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Pomodoro Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
-            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const m = (localStorage.getItem('g1-ai-model') || 'gemini-2.5-flash').trim(); const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
+            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const m = (localStorage.getItem('g1-ai-model') || 'gemini-1.5-flash').trim(); const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
 
             ai: {
                 currentEditIndex: -1,
