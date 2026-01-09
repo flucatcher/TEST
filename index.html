@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 - V13.8 (Auto Music Title)</title>
+    <title>Gen 1 - V14.0 (Cloud Activated)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,10 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
         /* =========================================
@@ -71,6 +75,7 @@
             transition: background 0.5s ease;
         }
 
+        /* SCROLLBAR */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -88,6 +93,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        /* UI ELEMENTS */
         #toast-container {
             position: fixed;
             top: 20px;
@@ -152,6 +158,7 @@
             transform: scale(0.95);
         }
 
+        /* LAYOUT */
         .app-container {
             display: flex;
             height: 100%;
@@ -175,8 +182,30 @@
             font-weight: 900;
             font-size: 1.6rem;
             color: var(--accent);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* User Avatar Style */
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            padding: 2px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--accent);
         }
 
         .nav-items {
@@ -211,6 +240,11 @@
 
         .sidebar-footer {
             margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         .theme-btn {
@@ -250,6 +284,72 @@
             transform: translateY(0);
         }
 
+        /* LOGIN OVERLAY (NEW) */
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-base);
+            background-image: var(--bg-image-default);
+            background-size: cover;
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: 0.5s;
+        }
+
+        #login-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .login-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(50px);
+            border: var(--glass-border);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-logo {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: white;
+            color: #333;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            margin-top: 30px;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .google-btn:hover {
+            background: #f8f8f8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* HOME */
         #home-view {
             justify-content: center;
             align-items: center;
@@ -309,6 +409,7 @@
             transform: rotate(10deg);
         }
 
+        /* DEEP FOCUS & POMODORO */
         #deep-view {
             background: #000;
             position: fixed;
@@ -912,7 +1013,6 @@
             flex-shrink: 0;
         }
 
-        /* FIXED PROGRESS BAR */
         .progress-container {
             width: 100%;
             margin-bottom: 15px;
@@ -1383,6 +1483,20 @@
 
 <body>
 
+    <div id="login-overlay">
+        <div class="login-box">
+            <div class="login-logo">G1</div>
+            <h2 style="margin-bottom:10px;">Welcome Back</h2>
+            <p style="color:var(--text-secondary); margin-bottom:30px;">Your AI Workspace is ready.</p>
+            <div class="google-btn" onclick="app.login()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="24"
+                    alt="Google">
+                <span>Sign in with Google</span>
+            </div>
+            <p style="margin-top:20px; font-size:0.8rem; opacity:0.6">Powered by Firebase</p>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <div id="event-modal">
@@ -1567,9 +1681,8 @@
             <div class="controls-wrapper">
                 <div class="progress-container" id="progress-container" onclick="app.music.onSeekClick(event)">
                     <div class="progress-bar" id="progress-bar"></div>
+                    <div class="time-info"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
                 </div>
-                <div class="time-info"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
-
                 <div class="controls"><button class="control-btn" onclick="app.music.prev()"><i
                             class="fas fa-step-backward"></i></button><button class="control-btn main-play"
                         id="play-btn" onclick="app.music.togglePlay()"><i class="fas fa-play"></i></button><button
@@ -1594,7 +1707,10 @@
     <div class="app-container">
         <aside class="sidebar">
             <div class="logo" onclick="app.nav('home-view')">G1</div>
-            <nav class="nav-items">
+            <img id="user-avatar" class="user-avatar" src="https://placehold.co/100x100/3b82f6/FFF?text=U"
+                style="display:none;" onclick="app.logout()">
+
+            <nav class="nav-items" style="margin-top:20px">
                 <a class="nav-btn active" onclick="app.nav('home-view')"><i class="fa-solid fa-house"></i></a>
                 <a href="https://notion.so" target="_blank" class="nav-btn"><i class="fa-solid fa-n"></i></a>
                 <a href="https://calendar.google.com" target="_blank" class="nav-btn"><i
@@ -1667,8 +1783,23 @@
         </main>
     </div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
+        // --- FIREBASE CONFIG (INSERTED) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjC7VPx-UEofwhr3byBWw8zAsQKHI7JSM",
+            authDomain: "gen1-app.firebaseapp.com",
+            projectId: "gen1-app",
+            storageBucket: "gen1-app.firebasestorage.app",
+            messagingSenderId: "338992842676",
+            appId: "1:338992842676:web:e84c144e2ba697406554e1",
+            measurementId: "G-KYTFBFS1QG"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
         let maxZIndex = 20000;
         function makeDraggable(el, headerId) {
             const header = document.getElementById(headerId);
@@ -1699,9 +1830,25 @@
         function onYouTubeIframeAPIReady() { app.music.initPlayer(); }
 
         const app = {
-            state: { theme: 'light' },
+            state: { theme: 'light', user: null },
 
             init() {
+                // AUTH LISTENER
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        this.state.user = user;
+                        document.getElementById('login-overlay').classList.add('hidden');
+                        document.getElementById('user-avatar').src = user.photoURL;
+                        document.getElementById('user-avatar').style.display = 'block';
+                        document.querySelector('.logo').style.display = 'none'; // Hide text logo, show avatar
+                        this.toast(`Welcome back, ${user.displayName}!`);
+                    } else {
+                        document.getElementById('login-overlay').classList.remove('hidden');
+                        document.getElementById('user-avatar').style.display = 'none';
+                        document.querySelector('.logo').style.display = 'flex';
+                    }
+                });
+
                 const savedTheme = localStorage.getItem('g1-theme') || 'light'; this.setTheme(savedTheme);
                 const savedKey = localStorage.getItem('g1-api-key'); if (savedKey) document.getElementById('api-key-input').value = savedKey;
                 document.getElementById('notes-area').value = localStorage.getItem('g1-notes') || "";
@@ -1716,14 +1863,19 @@
 
                 this.ai.renderGrid(); this.ai.loadSavedEvents(); this.ai.initTimeSelects();
                 this.goals.init(); this.stats.init(); this.settings.load(); this.settings.renderGallery();
+            },
 
-                // Force Reset Model to Stable Version
-                let savedModel = localStorage.getItem('g1-ai-model');
-                if (savedModel === 'gemini-2.0-flash-exp' || !savedModel) {
-                    savedModel = 'gemini-1.5-flash';
-                    localStorage.setItem('g1-ai-model', savedModel);
+            // --- AUTH FUNCTIONS ---
+            login() {
+                auth.signInWithPopup(provider).catch(error => {
+                    alert("Login Failed: " + error.message);
+                });
+            },
+
+            logout() {
+                if (confirm("Logout?")) {
+                    auth.signOut();
                 }
-                // document.getElementById('model-input').value = savedModel; // Removed model input to simplify
             },
 
             nav(id) {
@@ -1744,7 +1896,6 @@
 
             widget: { toggle(id) { const w = document.getElementById(id + '-widget') || document.getElementById(id + '-panel'); w.classList.toggle('show'); w.classList.add('active'); w.style.zIndex = ++maxZIndex; } },
 
-            // TOAST (RESTORED)
             toast(msg) {
                 const c = document.getElementById('toast-container');
                 const t = document.createElement('div');
@@ -1788,8 +1939,6 @@
             goals: { list: [], init() { const s = localStorage.getItem('g1-goals'); const d = localStorage.getItem('g1-goals-date'); const t = new Date().toDateString(); if (d !== t) { this.list = []; localStorage.setItem('g1-goals-date', t); } else if (s) this.list = JSON.parse(s); this.render(); }, add() { const i = document.getElementById('goal-input'); if (i.value.trim()) { this.list.push({ text: i.value.trim(), done: false }); this.save(); this.render(); i.value = ''; } }, toggle(i) { this.list[i].done = !this.list[i].done; this.save(); this.render(); }, remove(i) { this.list.splice(i, 1); this.save(); this.render(); }, clear() { if (confirm("Xóa?")) { this.list = []; this.save(); this.render(); } }, save() { localStorage.setItem('g1-goals', JSON.stringify(this.list)) }, render() { const c = document.getElementById('goal-list'); c.innerHTML = this.list.map((g, i) => `<div class="goal-item ${g.done ? 'done' : ''}"><input type="checkbox" class="goal-checkbox" ${g.done ? 'checked' : ''} onchange="app.goals.toggle(${i})"><span class="goal-text">${g.text}</span><i class="fa-solid fa-trash goal-delete" onclick="app.goals.remove(${i})"></i></div>`).join('') } },
             stats: { data: { pomos: 0, focusMinutes: 0, daily: [0, 0, 0, 0, 0, 0, 0] }, chart: null, init() { const s = localStorage.getItem('g1-stats'); if (s) this.data = JSON.parse(s); this.render(); }, logPomo(m) { this.data.pomos++; this.data.focusMinutes += m; const d = new Date().getDay(); const i = d === 0 ? 6 : d - 1; this.data.daily[i] += m; this.save(); this.render(); }, save() { localStorage.setItem('g1-stats', JSON.stringify(this.data)) }, render() { document.getElementById('total-focus-time').innerText = `${Math.floor(this.data.focusMinutes / 60)}h ${this.data.focusMinutes % 60}m`; if (this.chart) this.chart.destroy(); const ctx = document.getElementById('stats-chart').getContext('2d'); this.chart = new Chart(ctx, { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Mins', data: this.data.daily, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false } }); } },
             reminder: { timer: null, start(m) { clearTimeout(this.timer); this.timer = setTimeout(() => { document.getElementById('break-overlay').classList.add('active'); document.getElementById('audio-break').play(); }, m * 60 * 1000); }, close() { document.getElementById('break-overlay').classList.remove('active'); document.getElementById('audio-break').pause(); } },
-
-            // --- MUSIC PLAYER FIXED (TIMELINE & AUTO TITLE) ---
             music: {
                 player: null, isPlaying: false, currentIndex: 0, progressTimer: null,
                 playlist: JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }],
