@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 - V14.0 (Cloud Activated)</title>
+    <title>Gen 1 - V14.1 (Music Fix)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         /* =========================================
@@ -191,7 +191,6 @@
             align-items: center;
         }
 
-        /* User Avatar Style */
         .user-avatar {
             width: 45px;
             height: 45px;
@@ -284,18 +283,15 @@
             transform: translateY(0);
         }
 
-        /* LOGIN OVERLAY (NEW) */
+        /* LOGIN OVERLAY */
         #login-overlay {
             position: fixed;
             inset: 0;
             background: var(--bg-base);
-            background-image: var(--bg-image-default);
-            background-size: cover;
             z-index: 999999;
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             transition: 0.5s;
         }
 
@@ -306,23 +302,14 @@
 
         .login-box {
             background: var(--glass-bg);
-            backdrop-filter: blur(50px);
+            backdrop-filter: blur(30px);
             border: var(--glass-border);
             padding: 50px;
             border-radius: 30px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
             width: 90%;
-        }
-
-        .login-logo {
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent), #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            max-width: 400px;
         }
 
         .google-btn {
@@ -332,24 +319,21 @@
             gap: 10px;
             background: white;
             color: #333;
-            padding: 12px 25px;
-            border-radius: 12px;
+            padding: 12px 20px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            border: 1px solid #ddd;
             margin-top: 30px;
-            transition: 0.3s;
-            width: 100%;
-            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: 0.2s;
         }
 
         .google-btn:hover {
-            background: #f8f8f8;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-        /* HOME */
+        /* ... GIỮ NGUYÊN CSS CŨ ... */
         #home-view {
             justify-content: center;
             align-items: center;
@@ -409,7 +393,6 @@
             transform: rotate(10deg);
         }
 
-        /* DEEP FOCUS & POMODORO */
         #deep-view {
             background: #000;
             position: fixed;
@@ -1487,13 +1470,12 @@
         <div class="login-box">
             <div class="login-logo">G1</div>
             <h2 style="margin-bottom:10px;">Welcome Back</h2>
-            <p style="color:var(--text-secondary); margin-bottom:30px;">Your AI Workspace is ready.</p>
+            <p style="color:var(--text-secondary); margin-bottom:30px;">Sign in to access your cloud workspace</p>
             <div class="google-btn" onclick="app.login()">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="24"
-                    alt="Google">
+                    alt="G">
                 <span>Sign in with Google</span>
             </div>
-            <p style="margin-top:20px; font-size:0.8rem; opacity:0.6">Powered by Firebase</p>
         </div>
     </div>
 
@@ -1502,10 +1484,8 @@
     <div id="event-modal">
         <div class="quick-capture-box" style="width: 340px;">
             <h3 id="modal-title" style="margin-bottom: 15px; color: var(--accent);">Thêm sự kiện</h3>
-
             <input type="text" id="evt-title" class="settings-input-enhanced" style="width: 100%; margin-bottom: 15px;"
                 placeholder="Tên sự kiện...">
-
             <div style="margin-bottom: 15px;">
                 <label style="font-size: 0.8rem; opacity: 0.7; display: block; margin-bottom: 5px;">Chọn ngày</label>
                 <select id="evt-day" class="settings-input-enhanced" style="width: 100%; cursor: pointer;">
@@ -1518,30 +1498,21 @@
                     <option value="7" style="background:#1e293b">Chủ Nhật</option>
                 </select>
             </div>
-
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <div class="time-select-group">
-                    <select id="evt-start" class="time-select"></select>
-                </div>
+                <div class="time-select-group"><select id="evt-start" class="time-select"></select></div>
                 <div style="display: flex; align-items: center; color:var(--text-secondary);">-</div>
-                <div class="time-select-group">
-                    <select id="evt-end" class="time-select"></select>
-                </div>
+                <div class="time-select-group"><select id="evt-end" class="time-select"></select></div>
             </div>
-
             <div class="event-color-group" id="evt-colors">
                 <div class="color-option c-blue" onclick="app.ai.selectColor(this, '#3b82f6')"></div>
                 <div class="color-option c-red" onclick="app.ai.selectColor(this, '#ef4444')"></div>
                 <div class="color-option c-green" onclick="app.ai.selectColor(this, '#10b981')"></div>
                 <div class="color-option c-purple" onclick="app.ai.selectColor(this, '#8b5cf6')"></div>
                 <div class="color-option c-orange" onclick="app.ai.selectColor(this, '#f59e0b')"></div>
-
-                <div class="color-option custom-wheel" title="Chọn màu tùy ý">
-                    <input type="color" class="custom-color-input" id="custom-color-picker"
-                        oninput="app.ai.selectCustomColor(this.value)">
-                </div>
+                <div class="color-option custom-wheel" title="Chọn màu tùy ý"><input type="color"
+                        class="custom-color-input" id="custom-color-picker"
+                        oninput="app.ai.selectCustomColor(this.value)"></div>
             </div>
-
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-primary" style="flex: 1;" onclick="app.ai.saveEvent()">Lưu</button>
                 <button class="btn btn-secondary" style="flex: 1;" onclick="app.ai.closeModal()">Hủy</button>
@@ -1621,23 +1592,16 @@
         <div class="widget-header" id="settings-header"><span>Cài đặt</span><i class="fa-solid fa-xmark"
                 style="cursor:pointer; opacity:0.6" onclick="app.widget.toggle('settings')"></i></div>
         <div class="settings-content">
-            <div class="settings-group">
-                <span class="settings-label">Thư viện hình nền</span>
+            <div class="settings-group"><span class="settings-label">Thư viện hình nền</span>
                 <div class="bg-grid" id="bg-gallery"></div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Hình nền mới (URL)</span>
-                <div class="settings-input-group">
-                    <input type="text" class="settings-input-enhanced" id="bg-input"
-                        placeholder="Dán link ảnh tại đây..." onchange="app.settings.updateBG(this.value)">
-                    <button class="btn-icon-square" onclick="app.settings.saveCurrentToHistory()"><i
-                            class="fas fa-save"></i></button>
-                </div>
+            <div class="settings-group"><span class="settings-label">Hình nền mới (URL)</span>
+                <div class="settings-input-group"><input type="text" class="settings-input-enhanced" id="bg-input"
+                        placeholder="Dán link ảnh tại đây..." onchange="app.settings.updateBG(this.value)"><button
+                        class="btn-icon-square" onclick="app.settings.saveCurrentToHistory()"><i
+                            class="fas fa-save"></i></button></div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Màu chủ đạo</span>
+            <div class="settings-group"><span class="settings-label">Màu chủ đạo</span>
                 <div style="display:flex; justify-content:center; gap:10px;">
                     <div class="color-option c-blue" onclick="app.settings.updateAccent('#3b82f6')"></div>
                     <div class="color-option c-red" onclick="app.settings.updateAccent('#ef4444')"></div>
@@ -1646,13 +1610,8 @@
                     <div class="color-option c-orange" onclick="app.settings.updateAccent('#f59e0b')"></div>
                 </div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Độ mờ kính</span>
-                <input type="range" min="0" max="50" value="30" style="width:100%"
-                    oninput="app.settings.updateBlur(this.value)">
-            </div>
-
+            <div class="settings-group"><span class="settings-label">Độ mờ kính</span><input type="range" min="0"
+                    max="50" value="30" style="width:100%" oninput="app.settings.updateBlur(this.value)"></div>
             <button class="btn btn-secondary" style="width:100%" onclick="app.settings.resetLayout()">Reset
                 Layout</button>
         </div>
@@ -1662,10 +1621,9 @@
         <div class="music-widget">
             <div class="player-header" id="music-header">
                 <span class="logo"><i class="fab fa-youtube"></i> Music</span>
-                <div style="display:flex; gap:15px">
-                    <button class="icon-btn" onclick="app.music.togglePlaylistPanel()"><i
-                            class="fas fa-list"></i></button>
-                    <button class="icon-btn" onclick="app.widget.toggle('music')"><i class="fas fa-times"></i></button>
+                <div style="display:flex; gap:15px"><button class="icon-btn"
+                        onclick="app.music.togglePlaylistPanel()"><i class="fas fa-list"></i></button><button
+                        class="icon-btn" onclick="app.widget.toggle('music')"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             <div class="album-art-container">
@@ -1677,12 +1635,11 @@
                 <h2 id="track-title">Select a Song</h2>
                 <p id="track-artist">Library</p>
             </div>
-
             <div class="controls-wrapper">
                 <div class="progress-container" id="progress-container" onclick="app.music.onSeekClick(event)">
                     <div class="progress-bar" id="progress-bar"></div>
-                    <div class="time-info"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
                 </div>
+                <div class="time-info"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
                 <div class="controls"><button class="control-btn" onclick="app.music.prev()"><i
                             class="fas fa-step-backward"></i></button><button class="control-btn main-play"
                         id="play-btn" onclick="app.music.togglePlay()"><i class="fas fa-play"></i></button><button
@@ -1691,7 +1648,6 @@
                 <div class="volume-container"><i class="fas fa-volume-down"></i><input type="range" id="volume-slider"
                         min="0" max="100" value="50" oninput="app.music.setVolume(this.value)"></div>
             </div>
-
             <div class="playlist-panel" id="playlist-panel">
                 <div class="playlist-header">
                     <h3>Playlist</h3><button class="icon-btn" onclick="app.music.togglePlaylistPanel()"><i
@@ -1784,7 +1740,7 @@
     </div>
 
     <script>
-        // --- FIREBASE CONFIG (INSERTED) ---
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDjC7VPx-UEofwhr3byBWw8zAsQKHI7JSM",
             authDomain: "gen1-app.firebaseapp.com",
@@ -1794,10 +1750,8 @@
             appId: "1:338992842676:web:e84c144e2ba697406554e1",
             measurementId: "G-KYTFBFS1QG"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
         const provider = new firebase.auth.GoogleAuthProvider();
 
         let maxZIndex = 20000;
@@ -1807,7 +1761,6 @@
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             header.onmousedown = dragMouseDown;
             el.onmousedown = () => { maxZIndex++; el.style.zIndex = maxZIndex; };
-
             function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; document.querySelectorAll('.widget-draggable').forEach(w => w.classList.remove('active')); el.classList.add('active'); }
             function elementDrag(e) {
                 e.preventDefault();
@@ -1823,29 +1776,36 @@
             function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
         }
 
-        var ytPlayer, progressInterval;
-        let currentPlaylist = JSON.parse(localStorage.getItem('g1-custom-playlist')) || [];
-        let currentIndex = parseInt(localStorage.getItem('g1-playlist-index')) || 0;
-
-        function onYouTubeIframeAPIReady() { app.music.initPlayer(); }
+        // --- MUSIC PLAYER GLOBALS ---
+        var ytPlayer; // Not used directly, but good to have
+        // Ensure YouTube API callback is global
+        window.onYouTubeIframeAPIReady = function () {
+            if (app && app.music) {
+                app.music.initPlayer();
+            }
+        };
 
         const app = {
             state: { theme: 'light', user: null },
 
             init() {
-                // AUTH LISTENER
+                // LOAD YOUTUBE API MANUALLY TO ENSURE ORDER
+                if (!window.YT) {
+                    const tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    const firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                }
+
                 auth.onAuthStateChanged(user => {
                     if (user) {
-                        this.state.user = user;
                         document.getElementById('login-overlay').classList.add('hidden');
                         document.getElementById('user-avatar').src = user.photoURL;
                         document.getElementById('user-avatar').style.display = 'block';
-                        document.querySelector('.logo').style.display = 'none'; // Hide text logo, show avatar
-                        this.toast(`Welcome back, ${user.displayName}!`);
+                        document.querySelector('.logo').style.display = 'none';
+                        app.toast(`Welcome ${user.displayName}`);
                     } else {
                         document.getElementById('login-overlay').classList.remove('hidden');
-                        document.getElementById('user-avatar').style.display = 'none';
-                        document.querySelector('.logo').style.display = 'flex';
                     }
                 });
 
@@ -1865,18 +1825,8 @@
                 this.goals.init(); this.stats.init(); this.settings.load(); this.settings.renderGallery();
             },
 
-            // --- AUTH FUNCTIONS ---
-            login() {
-                auth.signInWithPopup(provider).catch(error => {
-                    alert("Login Failed: " + error.message);
-                });
-            },
-
-            logout() {
-                if (confirm("Logout?")) {
-                    auth.signOut();
-                }
-            },
+            login() { auth.signInWithPopup(provider).catch(e => alert(e.message)); },
+            logout() { auth.signOut(); window.location.reload(); },
 
             nav(id) {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1939,11 +1889,39 @@
             goals: { list: [], init() { const s = localStorage.getItem('g1-goals'); const d = localStorage.getItem('g1-goals-date'); const t = new Date().toDateString(); if (d !== t) { this.list = []; localStorage.setItem('g1-goals-date', t); } else if (s) this.list = JSON.parse(s); this.render(); }, add() { const i = document.getElementById('goal-input'); if (i.value.trim()) { this.list.push({ text: i.value.trim(), done: false }); this.save(); this.render(); i.value = ''; } }, toggle(i) { this.list[i].done = !this.list[i].done; this.save(); this.render(); }, remove(i) { this.list.splice(i, 1); this.save(); this.render(); }, clear() { if (confirm("Xóa?")) { this.list = []; this.save(); this.render(); } }, save() { localStorage.setItem('g1-goals', JSON.stringify(this.list)) }, render() { const c = document.getElementById('goal-list'); c.innerHTML = this.list.map((g, i) => `<div class="goal-item ${g.done ? 'done' : ''}"><input type="checkbox" class="goal-checkbox" ${g.done ? 'checked' : ''} onchange="app.goals.toggle(${i})"><span class="goal-text">${g.text}</span><i class="fa-solid fa-trash goal-delete" onclick="app.goals.remove(${i})"></i></div>`).join('') } },
             stats: { data: { pomos: 0, focusMinutes: 0, daily: [0, 0, 0, 0, 0, 0, 0] }, chart: null, init() { const s = localStorage.getItem('g1-stats'); if (s) this.data = JSON.parse(s); this.render(); }, logPomo(m) { this.data.pomos++; this.data.focusMinutes += m; const d = new Date().getDay(); const i = d === 0 ? 6 : d - 1; this.data.daily[i] += m; this.save(); this.render(); }, save() { localStorage.setItem('g1-stats', JSON.stringify(this.data)) }, render() { document.getElementById('total-focus-time').innerText = `${Math.floor(this.data.focusMinutes / 60)}h ${this.data.focusMinutes % 60}m`; if (this.chart) this.chart.destroy(); const ctx = document.getElementById('stats-chart').getContext('2d'); this.chart = new Chart(ctx, { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Mins', data: this.data.daily, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false } }); } },
             reminder: { timer: null, start(m) { clearTimeout(this.timer); this.timer = setTimeout(() => { document.getElementById('break-overlay').classList.add('active'); document.getElementById('audio-break').play(); }, m * 60 * 1000); }, close() { document.getElementById('break-overlay').classList.remove('active'); document.getElementById('audio-break').pause(); } },
+
             music: {
                 player: null, isPlaying: false, currentIndex: 0, progressTimer: null,
-                playlist: JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }],
+                // SAFE PLAYLIST LOADING
+                playlist: (() => {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('yt_playlist'));
+                        return (Array.isArray(saved) && saved.length > 0) ? saved : [{ title: "Lofi Girl", id: "jfKfPfyJRdk" }];
+                    } catch (e) { return [{ title: "Lofi Girl", id: "jfKfPfyJRdk" }]; }
+                })(),
 
-                initPlayer() { if (!window.YT) return; this.player = new YT.Player('player-hidden', { height: '1', width: '1', videoId: this.playlist[0].id, events: { 'onReady': () => this.loadTrack(this.currentIndex, false), 'onStateChange': (e) => this.onStateChange(e) } }); },
+                initPlayer() {
+                    if (!window.YT) return;
+                    try {
+                        this.player = new YT.Player('player-hidden', {
+                            height: '1', width: '1',
+                            videoId: this.playlist[0].id,
+                            playerVars: { 'origin': window.location.origin }, // Fix CORS
+                            events: {
+                                'onReady': () => this.loadTrack(this.currentIndex, false),
+                                'onStateChange': (e) => this.onStateChange(e),
+                                'onError': (e) => this.onError(e) // Error Handler
+                            }
+                        });
+                    } catch (e) { console.error("YT Init Error", e); }
+                },
+
+                onError(e) {
+                    console.log("YT Error:", e.data);
+                    if (e.data === 101 || e.data === 150) app.toast("Video restricted. Skipping...");
+                    else app.toast("Error playing video.");
+                    this.next(); // Skip to next
+                },
 
                 onStateChange(e) {
                     if (e.data == 1) { this.isPlaying = true; this.updateBtn(); this.startProgress(); }
@@ -1965,19 +1943,24 @@
                         }
                     }, 500);
                 },
-
                 stopProgress() { if (this.progressTimer) clearInterval(this.progressTimer); },
-
-                formatTime(s) {
-                    const m = Math.floor(s / 60);
-                    const sec = Math.floor(s % 60);
-                    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
-                },
-
+                formatTime(s) { const m = Math.floor(s / 60); const sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; },
                 togglePlay() { if (this.player) { if (this.isPlaying) this.player.pauseVideo(); else this.player.playVideo(); } },
                 next() { this.currentIndex = (this.currentIndex + 1) % this.playlist.length; this.loadTrack(this.currentIndex); },
                 prev() { this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length; this.loadTrack(this.currentIndex); },
-                loadTrack(i, auto = true) { this.currentIndex = i; const t = this.playlist[i]; document.getElementById('track-title').innerText = t.title; document.getElementById('current-art').innerHTML = `<img src="https://img.youtube.com/vi/${t.id}/0.jpg">`; this.renderList(); if (this.player && this.player.loadVideoById) { if (auto) this.player.loadVideoById(t.id); else this.player.cueVideoById(t.id); } },
+
+                loadTrack(i, auto = true) {
+                    this.currentIndex = i;
+                    const t = this.playlist[i];
+                    document.getElementById('track-title').innerText = t.title;
+                    document.getElementById('current-art').innerHTML = `<img src="https://img.youtube.com/vi/${t.id}/0.jpg">`;
+                    this.renderList();
+                    if (this.player && this.player.loadVideoById) {
+                        if (auto) this.player.loadVideoById(t.id);
+                        else this.player.cueVideoById(t.id);
+                    }
+                },
+
                 updateBtn() { document.getElementById('play-btn').innerHTML = this.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; },
 
                 async addFromInput() {
@@ -1989,26 +1972,21 @@
                             const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${v[1]}`);
                             const data = await res.json();
                             title = data.title || "New Song";
-                        } catch (e) {
-                            console.error("Auto-title failed", e);
-                        }
-
+                        } catch (e) { console.error("Auto-title failed", e); }
                         this.playlist.push({ title: title, id: v[1] });
                         localStorage.setItem('yt_playlist', JSON.stringify(this.playlist));
                         this.renderList();
                         document.getElementById('yt-url-input').value = '';
                         app.toast(`Added: ${title}`);
-                    } else {
-                        app.toast("Invalid URL");
-                    }
+                    } else { app.toast("Invalid URL"); }
                 },
-
                 renderList() { document.getElementById('playlist-list').innerHTML = this.playlist.map((t, i) => `<li class="playlist-item-new ${i === this.currentIndex ? 'active' : ''}" onclick="app.music.loadTrack(${i})"><div style="flex:1">${t.title}</div><button class="playlist-remove" onclick="event.stopPropagation();app.music.remove(${i})"><i class="fas fa-trash"></i></button></li>`).join(''); },
                 remove(i) { this.playlist.splice(i, 1); localStorage.setItem('yt_playlist', JSON.stringify(this.playlist)); this.renderList(); },
                 togglePlaylistPanel() { document.getElementById('playlist-panel').classList.toggle('active'); },
                 onSeekClick(e) { if (!this.player) return; const p = e.offsetX / e.target.clientWidth; this.player.seekTo(p * this.player.getDuration(), true); },
                 setVolume(v) { if (this.player) this.player.setVolume(v); }
             },
+
             deep: { timer: null, sec: 0, start() { app.nav('deep-view'); document.documentElement.requestFullscreen().catch(() => { }); this.timer = setInterval(() => { this.sec++; document.getElementById('deep-display').innerText = new Date(this.sec * 1000).toISOString().substr(11, 8) }, 1000); app.reminder.start(60); }, stop() { clearInterval(this.timer); document.exitFullscreen().catch(() => { }); app.nav('home-view'); app.reminder.close(); app.stats.logPomo(Math.floor(this.sec / 60)); } },
             pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Pomodoro Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
             chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const m = (localStorage.getItem('g1-ai-model') || 'gemini-1.5-flash').trim(); const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
@@ -2022,7 +2000,6 @@
                 getRandomColor() { return this.palette[Math.floor(Math.random() * this.palette.length)]; },
 
                 saveKey() { localStorage.setItem('g1-api-key', document.getElementById('api-key-input').value); app.toast("API Key Saved!"); },
-
                 clearData() { localStorage.removeItem('g1-events'); this.loadSavedEvents(); app.toast("Schedule Cleared!"); },
 
                 initTimeSelects() {
@@ -2077,9 +2054,7 @@
                     const f = i.files[0]; if (!f) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing API Key"); document.getElementById('loading-overlay').style.display = 'flex'; const r = new FileReader(); r.onload = async () => {
                         try {
                             const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${k}`; const p = "Extract schedule from image. Return ONLY raw JSON array: [{\"title\":\"Name\",\"day\":\"Mon\",\"start\":\"07:00\",\"end\":\"09:00\"}]. No markdown."; const res = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: p }, { inline_data: { mime_type: "image/jpeg", data: r.result.split(',')[1] } }] }] }) }); const d = await res.json(); const j = JSON.parse(d.candidates[0].content.parts[0].text.match(/\[.*\]/s)[0]);
-
                             j.forEach(e => { e.color = e.color || app.ai.getRandomColor(); });
-
                             localStorage.setItem('g1-events', JSON.stringify(j)); this.loadSavedEvents(); app.toast("Schedule Processed!");
                         } catch (e) { app.toast("AI Error: " + e.message) } finally { document.getElementById('loading-overlay').style.display = 'none' }
                     }; r.readAsDataURL(f);
@@ -2100,11 +2075,9 @@
                             el.className = 'event';
                             el.innerHTML = `<b>${e.title}</b><br>${e.start}-${e.end}`;
                             el.style.top = `${sm}px`; el.style.height = `${dur}px`;
-
                             const color = e.color || '#3b82f6';
                             el.style.background = color;
                             el.style.borderLeft = `4px solid rgba(0,0,0,0.2)`;
-
                             el.onclick = (event) => { event.stopPropagation(); app.ai.openModal('edit', { index: i, ...e }); };
                             c.appendChild(el);
                         }
@@ -2114,7 +2087,6 @@
                 openModal(mode, data) {
                     const m = document.getElementById('event-modal');
                     m.classList.add('active');
-
                     if (mode === 'add') {
                         document.getElementById('modal-title').innerText = "Thêm sự kiện";
                         document.getElementById('evt-title').value = "";
@@ -2122,7 +2094,6 @@
                         document.getElementById('evt-start').value = `${data.hour < 10 ? '0' + data.hour : data.hour}:00`;
                         document.getElementById('evt-end').value = `${data.hour + 1 < 10 ? '0' + (data.hour + 1) : data.hour + 1}:00`;
                         document.getElementById('btn-delete').style.display = 'none';
-
                         const randColor = this.getRandomColor();
                         this.selectColor(null, randColor);
                         this.currentEditIndex = -1;
@@ -2135,35 +2106,21 @@
                         document.getElementById('evt-start').value = data.start;
                         document.getElementById('evt-end').value = data.end;
                         document.getElementById('btn-delete').style.display = 'block';
-
-                        if (data.color) {
-                            this.selectedColor = data.color;
-                            document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
-                        }
+                        if (data.color) { this.selectedColor = data.color; document.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected')); }
                         this.currentEditIndex = data.index;
                     }
                 },
 
-                closeModal() {
-                    document.getElementById('event-modal').classList.remove('active');
-                },
+                closeModal() { document.getElementById('event-modal').classList.remove('active'); },
 
                 saveEvent() {
                     const title = document.getElementById('evt-title').value;
                     const day = document.getElementById('evt-day').value;
                     const start = document.getElementById('evt-start').value;
                     const end = document.getElementById('evt-end').value;
-
                     if (!title) return app.toast("Vui lòng nhập tên sự kiện");
-
                     const newEvent = { title, day, start, end, color: this.selectedColor };
-
-                    if (this.currentEditIndex === -1) {
-                        this.events.push(newEvent);
-                    } else {
-                        this.events[this.currentEditIndex] = newEvent;
-                    }
-
+                    if (this.currentEditIndex === -1) { this.events.push(newEvent); } else { this.events[this.currentEditIndex] = newEvent; }
                     localStorage.setItem('g1-events', JSON.stringify(this.events));
                     this.drawEvents(this.events);
                     this.closeModal();
