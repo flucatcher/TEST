@@ -1871,7 +1871,7 @@
 
             music: {
                 player: null, isPlaying: false, currentIndex: 0, progressTimer: null,
-                playlist: currentPlaylist,
+                playlist: JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }],
 
                 initPlayer() { if (!window.YT) return; this.player = new YT.Player('player-hidden', { height: '1', width: '1', videoId: this.playlist[0].id, events: { 'onReady': () => this.loadTrack(this.currentIndex, false), 'onStateChange': (e) => this.onStateChange(e) } }); },
 
@@ -1895,8 +1895,15 @@
                         }
                     }, 500);
                 },
+
                 stopProgress() { if (this.progressTimer) clearInterval(this.progressTimer); },
-                formatTime(s) { const m = Math.floor(s / 60); const sec = Math.floor(s % 60); return `${m}:${sec < 10 ? '0' : ''}${sec}`; },
+
+                formatTime(s) {
+                    const m = Math.floor(s / 60);
+                    const sec = Math.floor(s % 60);
+                    return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+                },
+
                 togglePlay() { if (this.player) { if (this.isPlaying) this.player.pauseVideo(); else this.player.playVideo(); } },
                 next() { this.currentIndex = (this.currentIndex + 1) % this.playlist.length; this.loadTrack(this.currentIndex); },
                 prev() { this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length; this.loadTrack(this.currentIndex); },
@@ -1912,14 +1919,20 @@
                             const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${v[1]}`);
                             const data = await res.json();
                             title = data.title || "New Song";
-                        } catch (e) { }
+                        } catch (e) {
+                            console.error("Auto-title failed", e);
+                        }
+
                         this.playlist.push({ title: title, id: v[1] });
                         localStorage.setItem('yt_playlist', JSON.stringify(this.playlist));
                         this.renderList();
                         document.getElementById('yt-url-input').value = '';
                         app.toast(`Added: ${title}`);
-                    } else { app.toast("Invalid URL"); }
+                    } else {
+                        app.toast("Invalid URL");
+                    }
                 },
+
                 renderList() { document.getElementById('playlist-list').innerHTML = this.playlist.map((t, i) => `<li class="playlist-item-new ${i === this.currentIndex ? 'active' : ''}" onclick="app.music.loadTrack(${i})"><div style="flex:1">${t.title}</div><button class="playlist-remove" onclick="event.stopPropagation();app.music.remove(${i})"><i class="fas fa-trash"></i></button></li>`).join(''); },
                 remove(i) { this.playlist.splice(i, 1); localStorage.setItem('yt_playlist', JSON.stringify(this.playlist)); this.renderList(); },
                 togglePlaylistPanel() { document.getElementById('playlist-panel').classList.toggle('active'); },
