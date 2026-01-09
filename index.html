@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 - V14.2 (Chat Fix)</title>
+    <title>Gen 1 - V14.2 (Guest Mode Enabled)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,7 +282,7 @@
             transform: translateY(0);
         }
 
-        /* LOGIN OVERLAY */
+        /* LOGIN OVERLAY - IMPROVED */
         #login-overlay {
             position: fixed;
             inset: 0;
@@ -332,7 +332,17 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 
-        /* HOME */
+        .guest-btn {
+            margin-top: 15px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+        }
+
+        /* ... GIỮ NGUYÊN CSS CŨ ... */
         #home-view {
             justify-content: center;
             align-items: center;
@@ -392,7 +402,6 @@
             transform: rotate(10deg);
         }
 
-        /* DEEP FOCUS & POMODORO */
         #deep-view {
             background: #000;
             position: fixed;
@@ -1476,6 +1485,7 @@
                     alt="G">
                 <span>Sign in with Google</span>
             </div>
+            <button class="guest-btn" onclick="app.guestLogin()">Dùng ngay (Không cần đăng nhập)</button>
         </div>
     </div>
 
@@ -1787,6 +1797,7 @@
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             header.onmousedown = dragMouseDown;
             el.onmousedown = () => { maxZIndex++; el.style.zIndex = maxZIndex; };
+
             function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; document.querySelectorAll('.widget-draggable').forEach(w => w.classList.remove('active')); el.classList.add('active'); }
             function elementDrag(e) {
                 e.preventDefault();
@@ -1824,14 +1835,23 @@
                 }
 
                 auth.onAuthStateChanged(user => {
+                    const overlay = document.getElementById('login-overlay');
                     if (user) {
-                        document.getElementById('login-overlay').classList.add('hidden');
+                        this.state.user = user;
+                        overlay.classList.add('hidden');
                         document.getElementById('user-avatar').src = user.photoURL;
                         document.getElementById('user-avatar').style.display = 'block';
-                        document.querySelector('.logo').style.display = 'none';
-                        app.toast(`Welcome ${user.displayName}`);
+                        document.querySelector('.logo').style.display = 'none'; // Hide text logo, show avatar
+                        app.toast(`Welcome back, ${user.displayName}!`);
                     } else {
-                        document.getElementById('login-overlay').classList.remove('hidden');
+                        // Check if guest mode was active
+                        if (sessionStorage.getItem('guest_mode') === 'true') {
+                            overlay.classList.add('hidden');
+                        } else {
+                            overlay.classList.remove('hidden');
+                        }
+                        document.getElementById('user-avatar').style.display = 'none';
+                        document.querySelector('.logo').style.display = 'flex';
                     }
                 });
 
@@ -1851,8 +1871,25 @@
                 this.goals.init(); this.stats.init(); this.settings.load(); this.settings.renderGallery();
             },
 
-            login() { auth.signInWithPopup(provider).catch(e => alert(e.message)); },
-            logout() { auth.signOut(); window.location.reload(); },
+            // --- AUTH FUNCTIONS ---
+            login() {
+                auth.signInWithPopup(provider).catch(error => {
+                    alert("Login Failed: " + error.message);
+                });
+            },
+
+            guestLogin() {
+                sessionStorage.setItem('guest_mode', 'true');
+                document.getElementById('login-overlay').classList.add('hidden');
+                app.toast("Guest Mode Activated");
+            },
+
+            logout() {
+                if (confirm("Logout?")) {
+                    sessionStorage.removeItem('guest_mode');
+                    auth.signOut().then(() => window.location.reload());
+                }
+            },
 
             nav(id) {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1987,8 +2024,8 @@
             },
 
             deep: { timer: null, sec: 0, start() { app.nav('deep-view'); document.documentElement.requestFullscreen().catch(() => { }); this.timer = setInterval(() => { this.sec++; document.getElementById('deep-display').innerText = new Date(this.sec * 1000).toISOString().substr(11, 8) }, 1000); app.reminder.start(60); }, stop() { clearInterval(this.timer); document.exitFullscreen().catch(() => { }); app.nav('home-view'); app.reminder.close(); app.stats.logPomo(Math.floor(this.sec / 60)); } },
-            pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
-            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
+            pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Pomodoro Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
+            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const m = (localStorage.getItem('g1-ai-model') || 'gemini-1.5-flash').trim(); const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
 
             ai: {
                 currentEditIndex: -1,
@@ -1999,6 +2036,7 @@
                 getRandomColor() { return this.palette[Math.floor(Math.random() * this.palette.length)]; },
 
                 saveKey() { localStorage.setItem('g1-api-key', document.getElementById('api-key-input').value); app.toast("API Key Saved!"); },
+
                 clearData() { localStorage.removeItem('g1-events'); this.loadSavedEvents(); app.toast("Cleared!"); },
 
                 initTimeSelects() {
@@ -2052,7 +2090,7 @@
                 handleUpload(i) {
                     const f = i.files[0]; if (!f) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing API Key"); document.getElementById('loading-overlay').style.display = 'flex'; const r = new FileReader(); r.onload = async () => {
                         try {
-                            const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${k}`; const p = "Extract schedule from image. Return ONLY raw JSON array: [{\"title\":\"Name\",\"day\":\"Mon\",\"start\":\"07:00\",\"end\":\"09:00\"}]. No markdown."; const res = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: p }, { inline_data: { mime_type: "image/jpeg", data: r.result.split(',')[1] } }] }] }) }); const d = await res.json(); const j = JSON.parse(d.candidates[0].content.parts[0].text.match(/\[.*\]/s)[0]);
+                            const u = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`; const p = "Extract schedule from image. Return ONLY raw JSON array: [{\"title\":\"Name\",\"day\":\"Mon\",\"start\":\"07:00\",\"end\":\"09:00\"}]. No markdown."; const res = await fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: p }, { inline_data: { mime_type: "image/jpeg", data: r.result.split(',')[1] } }] }] }) }); const d = await res.json(); const j = JSON.parse(d.candidates[0].content.parts[0].text.match(/\[.*\]/s)[0]);
                             j.forEach(e => { e.color = e.color || app.ai.getRandomColor(); });
                             localStorage.setItem('g1-events', JSON.stringify(j)); this.loadSavedEvents(); app.toast("Processed!");
                         } catch (e) { app.toast("Error: " + e.message) } finally { document.getElementById('loading-overlay').style.display = 'none' }
