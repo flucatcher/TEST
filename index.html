@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 - V14.2 (Guest Mode Enabled)</title>
+    <title>Gen 1 - V14.0 (Cloud Connected)</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,11 +181,10 @@
             color: var(--accent);
             margin-bottom: 30px;
             cursor: pointer;
-            width: 50px;
-            height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 50px;
         }
 
         .user-avatar {
@@ -194,16 +193,15 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--accent);
-            padding: 2px;
-            transition: 0.3s;
             cursor: pointer;
             display: none;
             margin-bottom: 30px;
+            transition: 0.3s;
         }
 
         .user-avatar:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 15px var(--accent);
+            box-shadow: 0 0 10px var(--accent);
         }
 
         .nav-items {
@@ -238,11 +236,7 @@
 
         .sidebar-footer {
             margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 20px;
+            padding-bottom: 20px;
         }
 
         .theme-btn {
@@ -282,7 +276,7 @@
             transform: translateY(0);
         }
 
-        /* LOGIN OVERLAY - IMPROVED */
+        /* LOGIN OVERLAY (MỚI) */
         #login-overlay {
             position: fixed;
             inset: 0;
@@ -330,16 +324,6 @@
         .google-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .guest-btn {
-            margin-top: 15px;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 0.9rem;
-            text-decoration: underline;
         }
 
         /* ... GIỮ NGUYÊN CSS CŨ ... */
@@ -1485,7 +1469,6 @@
                     alt="G">
                 <span>Sign in with Google</span>
             </div>
-            <button class="guest-btn" onclick="app.guestLogin()">Dùng ngay (Không cần đăng nhập)</button>
         </div>
     </div>
 
@@ -1494,10 +1477,8 @@
     <div id="event-modal">
         <div class="quick-capture-box" style="width: 340px;">
             <h3 id="modal-title" style="margin-bottom: 15px; color: var(--accent);">Thêm sự kiện</h3>
-
             <input type="text" id="evt-title" class="settings-input-enhanced" style="width: 100%; margin-bottom: 15px;"
                 placeholder="Tên sự kiện...">
-
             <div style="margin-bottom: 15px;">
                 <label style="font-size: 0.8rem; opacity: 0.7; display: block; margin-bottom: 5px;">Chọn ngày</label>
                 <select id="evt-day" class="settings-input-enhanced" style="width: 100%; cursor: pointer;">
@@ -1510,30 +1491,21 @@
                     <option value="7" style="background:#1e293b">Chủ Nhật</option>
                 </select>
             </div>
-
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <div class="time-select-group">
-                    <select id="evt-start" class="time-select"></select>
-                </div>
+                <div class="time-select-group"><select id="evt-start" class="time-select"></select></div>
                 <div style="display: flex; align-items: center; color:var(--text-secondary);">-</div>
-                <div class="time-select-group">
-                    <select id="evt-end" class="time-select"></select>
-                </div>
+                <div class="time-select-group"><select id="evt-end" class="time-select"></select></div>
             </div>
-
             <div class="event-color-group" id="evt-colors">
                 <div class="color-option c-blue" onclick="app.ai.selectColor(this, '#3b82f6')"></div>
                 <div class="color-option c-red" onclick="app.ai.selectColor(this, '#ef4444')"></div>
                 <div class="color-option c-green" onclick="app.ai.selectColor(this, '#10b981')"></div>
                 <div class="color-option c-purple" onclick="app.ai.selectColor(this, '#8b5cf6')"></div>
                 <div class="color-option c-orange" onclick="app.ai.selectColor(this, '#f59e0b')"></div>
-
-                <div class="color-option custom-wheel" title="Chọn màu tùy ý">
-                    <input type="color" class="custom-color-input" id="custom-color-picker"
-                        oninput="app.ai.selectCustomColor(this.value)">
-                </div>
+                <div class="color-option custom-wheel" title="Chọn màu tùy ý"><input type="color"
+                        class="custom-color-input" id="custom-color-picker"
+                        oninput="app.ai.selectCustomColor(this.value)"></div>
             </div>
-
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-primary" style="flex: 1;" onclick="app.ai.saveEvent()">Lưu</button>
                 <button class="btn btn-secondary" style="flex: 1;" onclick="app.ai.closeModal()">Hủy</button>
@@ -1613,23 +1585,16 @@
         <div class="widget-header" id="settings-header"><span>Cài đặt</span><i class="fa-solid fa-xmark"
                 style="cursor:pointer; opacity:0.6" onclick="app.widget.toggle('settings')"></i></div>
         <div class="settings-content">
-            <div class="settings-group">
-                <span class="settings-label">Thư viện hình nền</span>
+            <div class="settings-group"><span class="settings-label">Thư viện hình nền</span>
                 <div class="bg-grid" id="bg-gallery"></div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Hình nền mới (URL)</span>
-                <div class="settings-input-group">
-                    <input type="text" class="settings-input-enhanced" id="bg-input"
-                        placeholder="Dán link ảnh tại đây..." onchange="app.settings.updateBG(this.value)">
-                    <button class="btn-icon-square" onclick="app.settings.saveCurrentToHistory()"><i
-                            class="fas fa-save"></i></button>
-                </div>
+            <div class="settings-group"><span class="settings-label">Hình nền mới (URL)</span>
+                <div class="settings-input-group"><input type="text" class="settings-input-enhanced" id="bg-input"
+                        placeholder="Dán link ảnh tại đây..." onchange="app.settings.updateBG(this.value)"><button
+                        class="btn-icon-square" onclick="app.settings.saveCurrentToHistory()"><i
+                            class="fas fa-save"></i></button></div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Màu chủ đạo</span>
+            <div class="settings-group"><span class="settings-label">Màu chủ đạo</span>
                 <div style="display:flex; justify-content:center; gap:10px;">
                     <div class="color-option c-blue" onclick="app.settings.updateAccent('#3b82f6')"></div>
                     <div class="color-option c-red" onclick="app.settings.updateAccent('#ef4444')"></div>
@@ -1638,13 +1603,8 @@
                     <div class="color-option c-orange" onclick="app.settings.updateAccent('#f59e0b')"></div>
                 </div>
             </div>
-
-            <div class="settings-group">
-                <span class="settings-label">Độ mờ kính</span>
-                <input type="range" min="0" max="50" value="30" style="width:100%"
-                    oninput="app.settings.updateBlur(this.value)">
-            </div>
-
+            <div class="settings-group"><span class="settings-label">Độ mờ kính</span><input type="range" min="0"
+                    max="50" value="30" style="width:100%" oninput="app.settings.updateBlur(this.value)"></div>
             <button class="btn btn-secondary" style="width:100%" onclick="app.settings.resetLayout()">Reset
                 Layout</button>
         </div>
@@ -1654,10 +1614,9 @@
         <div class="music-widget">
             <div class="player-header" id="music-header">
                 <span class="logo"><i class="fab fa-youtube"></i> Music</span>
-                <div style="display:flex; gap:15px">
-                    <button class="icon-btn" onclick="app.music.togglePlaylistPanel()"><i
-                            class="fas fa-list"></i></button>
-                    <button class="icon-btn" onclick="app.widget.toggle('music')"><i class="fas fa-times"></i></button>
+                <div style="display:flex; gap:15px"><button class="icon-btn"
+                        onclick="app.music.togglePlaylistPanel()"><i class="fas fa-list"></i></button><button
+                        class="icon-btn" onclick="app.widget.toggle('music')"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             <div class="album-art-container">
@@ -1669,7 +1628,6 @@
                 <h2 id="track-title">Select a Song</h2>
                 <p id="track-artist">Library</p>
             </div>
-
             <div class="controls-wrapper">
                 <div class="progress-container" id="progress-container" onclick="app.music.onSeekClick(event)">
                     <div class="progress-bar" id="progress-bar"></div>
@@ -1683,7 +1641,6 @@
                 <div class="volume-container"><i class="fas fa-volume-down"></i><input type="range" id="volume-slider"
                         min="0" max="100" value="50" oninput="app.music.setVolume(this.value)"></div>
             </div>
-
             <div class="playlist-panel" id="playlist-panel">
                 <div class="playlist-header">
                     <h3>Playlist</h3><button class="icon-btn" onclick="app.music.togglePlaylistPanel()"><i
@@ -1700,18 +1657,16 @@
         <aside class="sidebar">
             <div class="logo" onclick="app.nav('home-view')">G1</div>
             <img id="user-avatar" class="user-avatar" src="https://placehold.co/100x100/3b82f6/FFF?text=U"
-                style="display:none;" onclick="app.logout()">
-
-            <nav class="nav-items" style="margin-top:20px">
+                onclick="app.logout()">
+            <nav class="nav-items" style="margin-top:20px;">
                 <a class="nav-btn active" onclick="app.nav('home-view')"><i class="fa-solid fa-house"></i></a>
                 <a href="https://notion.so" target="_blank" class="nav-btn"><i class="fa-solid fa-n"></i></a>
                 <a href="https://calendar.google.com" target="_blank" class="nav-btn"><i
                         class="fa-regular fa-calendar"></i></a>
                 <a class="nav-btn" onclick="app.widget.toggle('settings')"><i class="fa-solid fa-gear"></i></a>
             </nav>
-            <div class="sidebar-footer">
-                <button class="theme-btn" onclick="app.toggleTheme()"><i class="fa-solid fa-moon"></i></button>
-            </div>
+            <div class="sidebar-footer"><button class="theme-btn" onclick="app.toggleTheme()"><i
+                        class="fa-solid fa-moon"></i></button></div>
         </aside>
 
         <main class="main">
@@ -1797,15 +1752,13 @@
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             header.onmousedown = dragMouseDown;
             el.onmousedown = () => { maxZIndex++; el.style.zIndex = maxZIndex; };
-
             function dragMouseDown(e) { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; document.onmouseup = closeDragElement; document.onmousemove = elementDrag; document.querySelectorAll('.widget-draggable').forEach(w => w.classList.remove('active')); el.classList.add('active'); }
             function elementDrag(e) {
                 e.preventDefault();
                 pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
                 let top = el.offsetTop - pos2;
                 let left = el.offsetLeft - pos1;
-                if (top < 30) top = 0;
-                if (left < 30) left = 0;
+                if (top < 30) top = 0; if (left < 30) left = 0;
                 if (window.innerHeight - (top + el.offsetHeight) < 30) top = window.innerHeight - el.offsetHeight;
                 if (window.innerWidth - (left + el.offsetWidth) < 30) left = window.innerWidth - el.offsetWidth;
                 el.style.top = top + "px"; el.style.left = left + "px"; el.style.bottom = "auto"; el.style.right = "auto";
@@ -1813,45 +1766,25 @@
             function closeDragElement() { document.onmouseup = null; document.onmousemove = null; }
         }
 
-        // --- MUSIC PLAYER GLOBALS ---
-        var ytPlayer; // Not used directly, but good to have
-        // Ensure YouTube API callback is global
-        window.onYouTubeIframeAPIReady = function () {
-            if (app && app.music) {
-                app.music.initPlayer();
-            }
-        };
+        var ytPlayer, progressTimer;
+        let currentPlaylist = JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }];
+        let currentIndex = 0;
+
+        function onYouTubeIframeAPIReady() { app.music.initPlayer(); }
 
         const app = {
             state: { theme: 'light', user: null },
 
             init() {
-                // LOAD YOUTUBE API MANUALLY TO ENSURE ORDER
-                if (!window.YT) {
-                    const tag = document.createElement('script');
-                    tag.src = "https://www.youtube.com/iframe_api";
-                    const firstScriptTag = document.getElementsByTagName('script')[0];
-                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-                }
-
                 auth.onAuthStateChanged(user => {
-                    const overlay = document.getElementById('login-overlay');
                     if (user) {
-                        this.state.user = user;
-                        overlay.classList.add('hidden');
+                        document.getElementById('login-overlay').classList.add('hidden');
                         document.getElementById('user-avatar').src = user.photoURL;
                         document.getElementById('user-avatar').style.display = 'block';
-                        document.querySelector('.logo').style.display = 'none'; // Hide text logo, show avatar
-                        app.toast(`Welcome back, ${user.displayName}!`);
+                        document.querySelector('.logo').style.display = 'none';
+                        app.toast(`Welcome ${user.displayName}`);
                     } else {
-                        // Check if guest mode was active
-                        if (sessionStorage.getItem('guest_mode') === 'true') {
-                            overlay.classList.add('hidden');
-                        } else {
-                            overlay.classList.remove('hidden');
-                        }
-                        document.getElementById('user-avatar').style.display = 'none';
-                        document.querySelector('.logo').style.display = 'flex';
+                        document.getElementById('login-overlay').classList.remove('hidden');
                     }
                 });
 
@@ -1871,25 +1804,8 @@
                 this.goals.init(); this.stats.init(); this.settings.load(); this.settings.renderGallery();
             },
 
-            // --- AUTH FUNCTIONS ---
-            login() {
-                auth.signInWithPopup(provider).catch(error => {
-                    alert("Login Failed: " + error.message);
-                });
-            },
-
-            guestLogin() {
-                sessionStorage.setItem('guest_mode', 'true');
-                document.getElementById('login-overlay').classList.add('hidden');
-                app.toast("Guest Mode Activated");
-            },
-
-            logout() {
-                if (confirm("Logout?")) {
-                    sessionStorage.removeItem('guest_mode');
-                    auth.signOut().then(() => window.location.reload());
-                }
-            },
+            login() { auth.signInWithPopup(provider).catch(e => alert(e.message)); },
+            logout() { auth.signOut(); window.location.reload(); },
 
             nav(id) {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1933,7 +1849,7 @@
                 },
                 saveCurrentToHistory() {
                     const url = document.getElementById('bg-input').value.trim();
-                    if (url && !this.gallery.includes(url)) { this.gallery.push(url); localStorage.setItem('g1-bg-history', JSON.stringify(this.gallery)); this.renderGallery(); app.toast("Saved to Gallery!"); }
+                    if (url && !this.gallery.includes(url)) { this.gallery.push(url); localStorage.setItem('g1-bg-history', JSON.stringify(this.gallery)); this.renderGallery(); app.toast("Saved!"); }
                 },
                 updateAccent(col) { document.documentElement.style.setProperty('--accent', col); localStorage.setItem('g1-accent', col); },
                 updateBlur(val) { document.documentElement.style.setProperty('--glass-blur', val + 'px'); localStorage.setItem('g1-blur', val); },
@@ -1947,7 +1863,7 @@
                     this.gallery.forEach(url => { const div = document.createElement('div'); div.className = 'bg-item'; div.style.backgroundImage = `url('${url}')`; div.onclick = () => this.updateBG(url); c.appendChild(div); });
                 }
             },
-            quickCapture: { toggle() { const el = document.getElementById('quick-capture-overlay'); el.classList.toggle('active'); if (el.classList.contains('active')) document.getElementById('quick-input').focus(); }, save() { const val = document.getElementById('quick-input').value; if (val) { const area = document.getElementById('notes-area'); area.value += `\n- ${val}`; localStorage.setItem('g1-notes', area.value); document.getElementById('quick-input').value = ''; this.close(); app.toast("Note Saved!"); } }, close() { document.getElementById('quick-capture-overlay').classList.remove('active'); } },
+            quickCapture: { toggle() { const el = document.getElementById('quick-capture-overlay'); el.classList.toggle('active'); if (el.classList.contains('active')) document.getElementById('quick-input').focus(); }, save() { const val = document.getElementById('quick-input').value; if (val) { const area = document.getElementById('notes-area'); area.value += `\n- ${val}`; localStorage.setItem('g1-notes', area.value); document.getElementById('quick-input').value = ''; this.close(); app.toast("Saved!"); } }, close() { document.getElementById('quick-capture-overlay').classList.remove('active'); } },
             ambient: { setVolume(t, v) { const a = document.getElementById('audio-' + t); if (a) { a.volume = v / 100; if (v > 0 && a.paused) a.play().catch(() => { }); if (v == 0) a.pause(); } } },
             goals: { list: [], init() { const s = localStorage.getItem('g1-goals'); const d = localStorage.getItem('g1-goals-date'); const t = new Date().toDateString(); if (d !== t) { this.list = []; localStorage.setItem('g1-goals-date', t); } else if (s) this.list = JSON.parse(s); this.render(); }, add() { const i = document.getElementById('goal-input'); if (i.value.trim()) { this.list.push({ text: i.value.trim(), done: false }); this.save(); this.render(); i.value = ''; } }, toggle(i) { this.list[i].done = !this.list[i].done; this.save(); this.render(); }, remove(i) { this.list.splice(i, 1); this.save(); this.render(); }, clear() { if (confirm("Xóa?")) { this.list = []; this.save(); this.render(); } }, save() { localStorage.setItem('g1-goals', JSON.stringify(this.list)) }, render() { const c = document.getElementById('goal-list'); c.innerHTML = this.list.map((g, i) => `<div class="goal-item ${g.done ? 'done' : ''}"><input type="checkbox" class="goal-checkbox" ${g.done ? 'checked' : ''} onchange="app.goals.toggle(${i})"><span class="goal-text">${g.text}</span><i class="fa-solid fa-trash goal-delete" onclick="app.goals.remove(${i})"></i></div>`).join('') } },
             stats: { data: { pomos: 0, focusMinutes: 0, daily: [0, 0, 0, 0, 0, 0, 0] }, chart: null, init() { const s = localStorage.getItem('g1-stats'); if (s) this.data = JSON.parse(s); this.render(); }, logPomo(m) { this.data.pomos++; this.data.focusMinutes += m; const d = new Date().getDay(); const i = d === 0 ? 6 : d - 1; this.data.daily[i] += m; this.save(); this.render(); }, save() { localStorage.setItem('g1-stats', JSON.stringify(this.data)) }, render() { document.getElementById('total-focus-time').innerText = `${Math.floor(this.data.focusMinutes / 60)}h ${this.data.focusMinutes % 60}m`; if (this.chart) this.chart.destroy(); const ctx = document.getElementById('stats-chart').getContext('2d'); this.chart = new Chart(ctx, { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Mins', data: this.data.daily, backgroundColor: '#3b82f6', borderRadius: 4 }] }, options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false } }); } },
@@ -1955,7 +1871,7 @@
 
             music: {
                 player: null, isPlaying: false, currentIndex: 0, progressTimer: null,
-                playlist: JSON.parse(localStorage.getItem('yt_playlist')) || [{ title: "Lofi", id: "jfKfPfyJRdk" }],
+                playlist: currentPlaylist,
 
                 initPlayer() { if (!window.YT) return; this.player = new YT.Player('player-hidden', { height: '1', width: '1', videoId: this.playlist[0].id, events: { 'onReady': () => this.loadTrack(this.currentIndex, false), 'onStateChange': (e) => this.onStateChange(e) } }); },
 
@@ -1984,19 +1900,7 @@
                 togglePlay() { if (this.player) { if (this.isPlaying) this.player.pauseVideo(); else this.player.playVideo(); } },
                 next() { this.currentIndex = (this.currentIndex + 1) % this.playlist.length; this.loadTrack(this.currentIndex); },
                 prev() { this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length; this.loadTrack(this.currentIndex); },
-
-                loadTrack(i, auto = true) {
-                    this.currentIndex = i;
-                    const t = this.playlist[i];
-                    document.getElementById('track-title').innerText = t.title;
-                    document.getElementById('current-art').innerHTML = `<img src="https://img.youtube.com/vi/${t.id}/0.jpg">`;
-                    this.renderList();
-                    if (this.player && this.player.loadVideoById) {
-                        if (auto) this.player.loadVideoById(t.id);
-                        else this.player.cueVideoById(t.id);
-                    }
-                },
-
+                loadTrack(i, auto = true) { this.currentIndex = i; const t = this.playlist[i]; document.getElementById('track-title').innerText = t.title; document.getElementById('current-art').innerHTML = `<img src="https://img.youtube.com/vi/${t.id}/0.jpg">`; this.renderList(); if (this.player && this.player.loadVideoById) { if (auto) this.player.loadVideoById(t.id); else this.player.cueVideoById(t.id); } },
                 updateBtn() { document.getElementById('play-btn').innerHTML = this.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; },
 
                 async addFromInput() {
@@ -2008,7 +1912,7 @@
                             const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${v[1]}`);
                             const data = await res.json();
                             title = data.title || "New Song";
-                        } catch (e) { console.error("Auto-title failed", e); }
+                        } catch (e) { }
                         this.playlist.push({ title: title, id: v[1] });
                         localStorage.setItem('yt_playlist', JSON.stringify(this.playlist));
                         this.renderList();
@@ -2024,8 +1928,8 @@
             },
 
             deep: { timer: null, sec: 0, start() { app.nav('deep-view'); document.documentElement.requestFullscreen().catch(() => { }); this.timer = setInterval(() => { this.sec++; document.getElementById('deep-display').innerText = new Date(this.sec * 1000).toISOString().substr(11, 8) }, 1000); app.reminder.start(60); }, stop() { clearInterval(this.timer); document.exitFullscreen().catch(() => { }); app.nav('home-view'); app.reminder.close(); app.stats.logPomo(Math.floor(this.sec / 60)); } },
-            pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Pomodoro Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
-            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { let m = localStorage.getItem('g1-ai-model'); if (!m || m.trim() === 'gemini-1.5-flash') m = 'gemini-2.5-flash'; m = m.trim(); const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
+            pomo: { timer: null, time: 1500, running: false, toggle() { const b = document.getElementById('pomo-btn'); if (this.running) { clearInterval(this.timer); this.running = false; b.innerText = "Resume"; } else { this.timer = setInterval(() => { this.time--; const m = Math.floor(this.time / 60), s = this.time % 60; document.getElementById('pomo-display').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; if (this.time <= 0) { clearInterval(this.timer); app.toast("Done!"); this.reset(); app.stats.logPomo(25); } }, 1000); this.running = true; b.innerText = "Pause"; } }, reset() { clearInterval(this.timer); this.time = 1500; this.running = false; document.getElementById('pomo-display').innerText = "25:00"; document.getElementById('pomo-btn').innerText = "Start"; } },
+            chat: { async send() { const i = document.getElementById('chat-input'); if (!i.value) return; const k = localStorage.getItem('g1-api-key'); if (!k) return app.toast("Missing Key"); this.append(i.value, 'user'); const t = i.value; i.value = ''; try { const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${k}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: t }] }] }) }); const d = await r.json(); if (d.error) throw new Error(d.error.message); this.append(d.candidates[0].content.parts[0].text, 'bot'); } catch (e) { this.append("Error: " + e.message, 'bot') } }, append(t, r) { const d = document.createElement('div'); d.className = `message ${r}`; d.innerText = t; document.getElementById('chat-messages').appendChild(d); } },
 
             ai: {
                 currentEditIndex: -1,
@@ -2036,7 +1940,6 @@
                 getRandomColor() { return this.palette[Math.floor(Math.random() * this.palette.length)]; },
 
                 saveKey() { localStorage.setItem('g1-api-key', document.getElementById('api-key-input').value); app.toast("API Key Saved!"); },
-
                 clearData() { localStorage.removeItem('g1-events'); this.loadSavedEvents(); app.toast("Cleared!"); },
 
                 initTimeSelects() {
